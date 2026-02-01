@@ -1,71 +1,111 @@
 <app-tool-layout [tool]="tool">
-	<div class="card">
+	<div class="card shadow-sm">
 		<ul class="nav nav-tabs px-3 pt-3"
 			[activeId]="activeTab()"
 			(activeIdChange)="activeTab.set($event)"
 			#nav="ngbNav" ngbNav>
 
 			<li class="nav-item" [ngbNavItem]="'config'">
-				<button class="nav-link" type="button" ngbNavLink>Config</button>
+				<button class="nav-link fw-medium" type="button" ngbNavLink>Config</button>
 				<ng-template ngbNavContent>
 					<div class="card-body">
-						<div class="d-flex justify-content-between align-items-center mb-2">
-							<h2 class="h6 mb-0">CSV configuration</h2>
-							<button class="btn btn-outline-danger" type="button" (click)="clearLocalConfig()">Clear</button>
+						<div class="d-flex justify-content-between align-items-center mb-3">
+							<div>
+								<h2 class="h6 mb-0 fw-bold">CSV Configuration</h2>
+								<p class="text-muted small mb-0">
+									Paste or Drag & Drop a CSV with <code>jiraField, jiraValue, description, group</code>
+								</p>
+							</div>
+							<button class="btn btn-sm btn-outline-danger"
+									type="button"
+									(click)="clearLocalConfig()"
+									[disabled]="!csvInput() && !fieldKeys().length">
+								<i class="bi bi-trash3"></i> Clear
+							</button>
 						</div>
 
-						<p class="text-muted small">
-							Paste a CSV with <code>jiraField,jiraValue,description,group</code>
-							as the header row. Values are stored locally.
-						</p>
+						<div class="card bg-light border-0 mb-3">
+							<div class="card-body p-2 d-flex align-items-center gap-3">
+								<label class="btn btn-primary btn-sm mb-0">
+									<i class="bi bi-file-earmark-arrow-up"></i> Upload CSV
+									<input class="d-none" type="file" (change)="onFileSelected($event)" accept=".csv,text/csv"/>
+								</label>
 
-						<div class="mb-2 d-flex align-items-center gap-2">
-							<label class="btn btn-outline-secondary mb-0">
-								<i class="bi bi-file-arrow-up-fill"></i> Upload CSV
-								<input class="d-none" type="file" (change)="onFileSelected($event)" accept=".csv,text/csv"/>
-							</label>
+								<div class="vr text-secondary opacity-25"></div>
 
-							@if (csvFileName()) {
-								<span class="text-success small">File loaded: {{ csvFileName() }}</span>
+								<div class="flex-grow-1 small">
+									@if (csvFileName()) {
+										<span class="text-success fw-medium">
+                                 <i class="bi bi-file-check-fill"></i> {{ csvFileName() }}
+                              </span>
+									} @else {
+										<span class="text-muted italic">No file selected</span>
+									}
+								</div>
+							</div>
+						</div>
+
+						<div class="mb-3 position-relative">
+                     <textarea
+							 class="form-control mb-2 font-monospace drop-zone"
+							 [class.file-over]="dnd.fileOver"
+							 appDragAndDrop
+							 #dnd="appDragAndDrop"
+							 (fileDropped)="onFileDropped($event)"
+							 id="ta_csv"
+							 placeholder="Paste CSV rows here..."
+							 rows="10"
+							 [ngModel]="csvInput()"
+							 (ngModelChange)="csvInput.set($event)">
+                     </textarea>
+
+							@if (dnd.fileOver) {
+								<div class="dnd-overlay d-flex flex-column align-items-center justify-content-center">
+									<i class="bi bi-file-earmark-arrow-up display-4 text-primary"></i>
+									<p class="fw-bold text-primary mt-2">Drop CSV to Load Configuration</p>
+								</div>
 							}
 						</div>
 
-						<div class="mb-3">
-                      <textarea
-							  class="form-control mb-2 font-monospace"
-							  id="ta_csv"
-							  placeholder="Paste CSV here" rows="10"
-							  [ngModel]="csvInput()"
-							  (ngModelChange)="csvInput.set($event)"></textarea>
-						</div>
+						<div class="d-flex justify-content-between align-items-center">
+							<button class="btn btn-link btn-sm text-decoration-none p-0" type="button" (click)="loadSampleCsv()">
+								<i class="bi bi-lightbulb"></i> Load sample CSV
+							</button>
 
-						<div class="d-flex justify-content-between align-items-center mt-2">
-							<button class="btn btn-outline-secondary" type="button" (click)="loadSampleCsv()">Load sample</button>
-							<button class="btn btn-success" type="button" (click)="onApplyCsv()" [disabled]="!csvInput() || !csvInput().trim()">
-								<i class="bi bi-check"></i> Apply CSV
+							<button class="btn btn-success" type="button"
+									(click)="onApplyCsv()"
+									[disabled]="!csvInput() || !csvInput().trim()">
+								<i class="bi bi-check-circle"></i> Apply Configuration
 							</button>
 						</div>
 
 						@if (fieldKeys().length) {
-							<hr class="my-3"/>
-							<p class="text-muted small mb-0">Loaded {{ fieldKeys().length }} fields.</p>
+							<div class="alert alert-info py-2 px-3 mt-3 mb-0 small border-0">
+								<i class="bi bi-info-circle-fill me-2"></i>
+								Active configuration detected for <strong>{{ fieldKeys().length }}</strong> Jira fields.
+							</div>
 						}
 					</div>
 				</ng-template>
 			</li>
 
 			<li [ngbNavItem]="'query'">
-				<button class="nav-link" type="button" ngbNavLink>Query</button>
+				<button class="nav-link fw-medium" type="button" ngbNavLink>Query</button>
 				<ng-template ngbNavContent>
 					<div class="card-body d-flex flex-column">
-						<h2 class="h6 fw-semibold mb-3">Values &amp; JQL</h2>
+						<div class="d-flex justify-content-between align-items-end mb-3">
+							<h2 class="h6 fw-semibold mb-0">Values & Selection</h2>
+							<span class="badge bg-secondary-subtle text-secondary">{{ fieldKeys().length }} Fields</span>
+						</div>
 
 						@if (fieldKeys().length) {
-							<div class="mb-3 container-fluid" style="max-height: 500px; overflow-y: auto;">
+							<div class="mb-4 container-fluid border rounded bg-white" style="max-height: 500px; overflow-y: auto;">
 								@for (field of fieldKeys(); track field) {
-									<div class="row mb-2 border-bottom">
+									<div class="row py-3 border-bottom last-child-border-0">
 										<div class="col-12 col-md-3 col-lg-2">
-											<h3 class="fw-light fs-5">{{ field }}</h3>
+											<h3 class="fw-bold fs-6 text-uppercase text-muted mb-2 mb-md-0">
+												{{ field }}
+											</h3>
 										</div>
 										<div class="col">
 											<app-jql-group-columns
@@ -79,22 +119,34 @@
 								}
 							</div>
 
-							<h3 class="h6 fw-semibold mt-2">Generated JQL (editable)</h3>
+							<h3 class="h6 fw-semibold mt-2">Generated JQL</h3>
 
 							@if (generatedJql()) {
-								<textarea class="form-control font-monospace mb-2"
+								<textarea class="form-control font-monospace mb-3 bg-light"
 										  rows="5"
 										  [ngModel]="manualQuery()"
-										  (ngModelChange)="manualQuery.set($event)">
-                         </textarea>
+										  (ngModelChange)="manualQuery.set($event)"
+										  placeholder="JQL will appear here...">
+								</textarea>
 
 								<div class="d-flex justify-content-between align-items-center">
-									<button class="btn btn-outline-danger" (click)="resetQuery()">Reset</button>
-									<app-copy-to-clipboard-btn [textToCopy]="manualQuery() || generatedJql()"></app-copy-to-clipboard-btn>
+									<button class="btn btn-outline-secondary btn-sm" (click)="resetQuery()">
+										<i class="bi bi-arrow-counterclockwise"></i> Reset to Generated
+									</button>
+									<app-copy-to-clipboard-btn
+											[textToCopy]="manualQuery() || generatedJql()">
+									</app-copy-to-clipboard-btn>
+								</div>
+							} @else {
+								<div class="text-center py-4 bg-light rounded">
+									<p class="text-muted mb-0">Select at least one value above to generate JQL.</p>
 								</div>
 							}
 						} @else {
-							<p class="text-muted">No configuration loaded yet.</p>
+							<div class="text-center py-5">
+								<i class="bi bi-clipboard-x display-1 text-light"></i>
+								<p class="text-muted mt-3">No configuration loaded. Start in the <strong>Config</strong> tab.</p>
+							</div>
 						}
 					</div>
 				</ng-template>

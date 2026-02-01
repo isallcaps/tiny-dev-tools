@@ -1,0 +1,51 @@
+// Container for the textarea + overlay
+.position-relative {
+  .dnd-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    // Aesthetic: Slight blur and themed background
+    background-color: rgba(var(--bs-primary-rgb), 0.05);
+    backdrop-filter: blur(2px);
+    border: 2px dashed var(--bs-primary);
+    border-radius: var(--bs-border-radius);
+
+    // Crucial: Allows drag/drop events to pass through to the textarea
+    pointer-events: none;
+    z-index: 5;
+    transition: all 0.2s ease-in-out;
+  }
+}
+
+.drop-zone {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &.file-over {
+    // Give the textarea a "recessed" look when a file is hovering
+    opacity: 0.4;
+    transform: scale(0.99);
+  }
+}
+
+// Custom scrollbar for the Query container to make it look sleeker
+.container-fluid[style*="max-height"] {
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--bs-light);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--bs-secondary-bg);
+    border-radius: 10px;
+
+    &:hover {
+      background: var(--bs-secondary);
+    }
+  }
+}

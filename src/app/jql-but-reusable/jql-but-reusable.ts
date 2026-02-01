@@ -9,6 +9,7 @@ import {FieldSelectionChange, GroupColumnComponent} from './components/jql-group
 import {Component, OnInit, signal, computed, effect, inject, DestroyRef} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {readFileAsText} from '../shared/utils/file-reader.utils';
+import {DragAndDrop} from '../shared/directives/drag-and-drop';
 
 const LOCAL_STORAGE_ROWS_KEY = 'tiny-dev-tools:jql-config-rows';
 const LOCAL_STORAGE_SELECTIONS_KEY = 'tiny-dev-tools:jql-selections';
@@ -21,7 +22,7 @@ const LOCAL_STORAGE_SELECTIONS_KEY = 'tiny-dev-tools:jql-selections';
 		CopyToClipboardBtn,
 		FormsModule,
 		NgbNavModule,
-		GroupColumnComponent],
+		GroupColumnComponent, DragAndDrop],
 	templateUrl: 'jql-but-reusable.html',
 })
 export class JqlButReusable implements OnInit {
@@ -59,6 +60,23 @@ export class JqlButReusable implements OnInit {
 
 	ngOnInit():void {
 		this.loadFromLocalStorage();
+	}
+
+	onFileDropped(file:File):void {
+		this.csvFileName.set(file.name);
+
+		readFileAsText(file)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (content) => {
+					this.csvInput.set(content);
+					// this.onApplyCsv(); // Optional: Auto-apply on drop
+				},
+				error: (err) => {
+					console.error(err);
+					this.csvFileName.set('Error loading file');
+				}
+			});
 	}
 
 
