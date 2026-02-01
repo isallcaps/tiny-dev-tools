@@ -78,3 +78,21 @@ Everything runs client-side.
 ```bash
 npm install
 ng serve
+```
+
+Then open:
+http://localhost:4200
+
+---
+
+## GitHub Pages deployment
+
+This project is deployed using GitHub Pages.
+
+Build command:
+
+```bash
+ng build --base-href /tiny-dev-tools/
+```
+
+The compiled output is committed to the `docs/` folder and served from the main branch.
