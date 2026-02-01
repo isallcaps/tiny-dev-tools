@@ -71,7 +71,7 @@ import {ToolLayout} from '../shared/components/tool-layout/tool-layout';
 				</div>
 
 				<div class="col">
-                <textarea class="form-control font-monospace" rows="20" id="output"
+                <textarea class="form-control tool-textarea" rows="20" id="output"
 						  [maxLength]="characterLimit()"
 						  [ngModel]="output()"
 						  (ngModelChange)="output.set($event)">
