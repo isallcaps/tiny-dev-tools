@@ -1,18 +1,15 @@
 import {Component, signal} from '@angular/core';
 import {RouterLink, RouterOutlet} from '@angular/router';
-import {PageLinks} from "./shared/constants/page-links.constants";
-import {NgbCollapse} from "@ng-bootstrap/ng-bootstrap";
+import {NavMenu} from './nav-menu/nav-menu';
+import {APP_VERSION} from './shared/constants/version.constants';
 
 @Component({
 	selector: 'app-root',
-	imports: [RouterOutlet, RouterLink, NgbCollapse],
+	imports: [RouterOutlet, RouterLink, NavMenu],
 	templateUrl: './app.html',
 	styleUrl: './app.scss'
 })
 export class App {
 	protected readonly title = signal('Tiny Dev Tools');
-
-	protected readonly links = PageLinks.List;
-
-	isMenuCollapsed = true;
+	readonly appVersion = APP_VERSION;
 }

@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
-import {PageLinks} from "../shared/constants/page-links.constants";
 import {RouterLink} from "@angular/router";
+import {Tool, TOOLS} from "../shared/constants/tools.constants";
 
 @Component({
 	selector: 'app-home',
@@ -8,22 +8,50 @@ import {RouterLink} from "@angular/router";
 		RouterLink
 	],
 	template: `
-		<h2 class="mb-3">Some tools to make dev easier.</h2>
+		<div class="container py-5">
+			<div class="row mb-5">
+				<div class="col text-center">
+					<h1 class="fw-bold">Tiny Dev Tools</h1>
+					<p class="text-muted fs-5">
+						Little tools for very specific front-end annoyances.
+					</p>
+				</div>
+			</div>
 
-		<div class="list-group">
-			@for (link of links; track link.path) {
-				<a class="list-group-item list-group-item-action" [routerLink]="link.path">
-					<span class="fw-bold">{{ link.title }}</span>
-					@if (link.description) {
-						<span class="ps-3 fw-light fst-italic">{{ link.description }}</span>
-					}
-				</a>
-			}
+			<div class="row g-4">
+				@for (tool of tools; track tool.id) {
+					<div class="col-12 col-md-6 col-lg-4">
+						<div class="card h-100 shadow-sm"
+							 [class.opacity-50]="tool.disabled">
+							<div class="card-body d-flex flex-column">
+								<h5 class="card-title">{{ tool.title }}</h5>
+
+								@if (tool.description) {
+									<p class="card-text text-muted">
+										{{ tool.description }}
+									</p>
+								}
+
+								@if (!tool.disabled) {
+									<a [routerLink]="['/', tool.path]"
+									   class="btn btn-outline-primary mt-auto align-self-start">
+										Open tool →
+									</a>
+								} @else {
+									<span class="text-muted mt-auto">
+										Coming soon
+									</span>
+								}
+							</div>
+						</div>
+					</div>
+				}
+			</div>
 		</div>
 
 	`,
 	styles: ``,
 })
 export class Home {
-	protected readonly links = PageLinks.List;
+	readonly tools: readonly Tool[] = TOOLS;
 }

@@ -4,12 +4,6 @@ import {Injectable} from '@angular/core';
 	providedIn: 'root',
 })
 export class LoremIpsum {
-	private words = [
-		'lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur',
-		'adipiscing', 'elit', 'sed', 'do', 'eiusmod', 'tempor',
-		'incididunt', 'ut', 'labore', 'et', 'dolore', 'magna', 'aliqua'
-	];
-
 	private dictionaries = {
 		latin: ['lorem', 'ipsum', 'consectetur', 'adipisicing', 'elit', 'sed', 'do', 'eiusmod', 'tempor', 'incididunt', 'ut', 'labore', 'et', 'dolore',
 			'magna', 'aliqua', 'ut', 'enim', 'ad', 'minim', 'veniam', 'quis', 'nostrud', 'exercitation', 'ullamco', 'laboris', 'nisi', 'ut',
@@ -24,7 +18,7 @@ export class LoremIpsum {
 		],
 		pirate: ['arr', 'matey', 'ahoy', 'scurvy', 'dog', 'landlubber', 'plunder']
 	};
-	
+
 
 	generateWithPreAndSuffix(limit: number, type: 'latin' | 'cupcake' = 'latin', prefix: string = '', suffix: string = ''): string {
 		const words = this.dictionaries[type];
