@@ -71,8 +71,7 @@ export class JqlButReusable implements OnInit {
 
 		const reader = new FileReader();
 		reader.onload = () => {
-			const text = reader.result?.toString() ?? '';
-			this.csvInput = text;
+			this.csvInput = reader.result?.toString() ?? '';
 		};
 		reader.readAsText(file);
 	}
