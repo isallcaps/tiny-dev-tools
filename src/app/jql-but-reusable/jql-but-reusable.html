@@ -1,109 +1,77 @@
 <app-tool-layout [tool]="tool">
 	<div class="card">
-		<!-- Nav tabs -->
-		<ul class="nav nav-tabs px-3 pt-3" [(activeId)]="activeTab"
+		<ul class="nav nav-tabs px-3 pt-3"
+			[activeId]="activeTab()"
+			(activeIdChange)="activeTab.set($event)"
 			#nav="ngbNav" ngbNav>
+
 			<li class="nav-item" [ngbNavItem]="'config'">
-				<button class="nav-link" type="button" ngbNavLink>
-					Config
-				</button>
+				<button class="nav-link" type="button" ngbNavLink>Config</button>
 				<ng-template ngbNavContent>
-					<!-- Config tab content -->
 					<div class="card-body">
 						<div class="d-flex justify-content-between align-items-center mb-2">
 							<h2 class="h6 mb-0">CSV configuration</h2>
-
-							<button class="btn btn-outline-danger" type="button"
-									(click)="clearLocalConfig()">
-								Clear
-							</button>
+							<button class="btn btn-outline-danger" type="button" (click)="clearLocalConfig()">Clear</button>
 						</div>
 
 						<p class="text-muted small">
-							Paste a CSV with
-							<code>jiraField,jiraValue,description,group</code>
-							as the header row, or upload a CSV file. Values are stored
-							locally in your browser.
+							Paste a CSV with <code>jiraField,jiraValue,description,group</code>
+							as the header row. Values are stored locally.
 						</p>
 
 						<div class="mb-2 d-flex align-items-center gap-2">
 							<label class="btn btn-outline-secondary mb-0">
 								<i class="bi bi-file-arrow-up-fill"></i> Upload CSV
-								<input class="d-none"
-									   type="file" (change)="onFileSelected($event)"
-									   accept=".csv,text/csv"/>
+								<input class="d-none" type="file" (change)="onFileSelected($event)" accept=".csv,text/csv"/>
 							</label>
 
-							@if (csvFileName) {
-								<span class="text-success small">
-									File loaded: {{ csvFileName }}
-								</span>
+							@if (csvFileName()) {
+								<span class="text-success small">File loaded: {{ csvFileName() }}</span>
 							}
 						</div>
 
-						<!-- CSV textarea -->
 						<div class="mb-3">
-							<textarea
-									class="form-control mb-2 font-monospace"
-									id="ta_csv"
-									placeholder="Paste CSV here or upload a file" rows="10"
-									[(ngModel)]="csvInput"></textarea>
+                      <textarea
+							  class="form-control mb-2 font-monospace"
+							  id="ta_csv"
+							  placeholder="Paste CSV here" rows="10"
+							  [ngModel]="csvInput()"
+							  (ngModelChange)="csvInput.set($event)"></textarea>
 						</div>
 
-						<!-- Apply -->
 						<div class="d-flex justify-content-between align-items-center mt-2">
-							<div>
-								<p class="text-muted small mb-2">
-									Not sure where to start? Load a sample and tweak it.
-								</p>
-
-								<button class="btn btn-outline-secondary"
-										type="button"
-										(click)="loadSampleCsv()">
-									Load sample CSV
-								</button>
-							</div>
-
-							<button class="btn btn-success" type="button"
-									(click)="onApplyCsv()" [disabled]="!csvInput || !csvInput.trim()">
+							<button class="btn btn-outline-secondary" type="button" (click)="loadSampleCsv()">Load sample</button>
+							<button class="btn btn-success" type="button" (click)="onApplyCsv()" [disabled]="!csvInput() || !csvInput().trim()">
 								<i class="bi bi-check"></i> Apply CSV
 							</button>
 						</div>
 
-						@if (fieldKeys.length) {
+						@if (fieldKeys().length) {
 							<hr class="my-3"/>
-							<p class="text-muted small mb-0">
-								Loaded configuration for {{ fieldKeys.length }} Jira fields.
-							</p>
+							<p class="text-muted small mb-0">Loaded {{ fieldKeys().length }} fields.</p>
 						}
 					</div>
 				</ng-template>
 			</li>
 
 			<li [ngbNavItem]="'query'">
-				<button class="nav-link" type="button" ngbNavLink>
-					Query
-				</button>
+				<button class="nav-link" type="button" ngbNavLink>Query</button>
 				<ng-template ngbNavContent>
-					<!-- Query tab content -->
 					<div class="card-body d-flex flex-column">
 						<h2 class="h6 fw-semibold mb-3">Values &amp; JQL</h2>
 
-						@if (fieldKeys.length) {
-							<!-- Grouped values -->
+						@if (fieldKeys().length) {
 							<div class="mb-3 container-fluid" style="max-height: 500px; overflow-y: auto;">
-								@for (field of fieldKeys; track field) {
+								@for (field of fieldKeys(); track field) {
 									<div class="row mb-2 border-bottom">
 										<div class="col-12 col-md-3 col-lg-2">
-											<h3 class="fw-light fs-5">
-												{{ field }}
-											</h3>
+											<h3 class="fw-light fs-5">{{ field }}</h3>
 										</div>
 										<div class="col">
 											<app-jql-group-columns
 													[field]="field"
-													[fieldConfig]="grouped[field]"
-													[selectionsForField]="selections[field] || {}"
+													[fieldConfig]="grouped()[field]"
+													[selectionsForField]="selections()[field] || {}"
 													(selectionChange)="onFieldSelectionChange($event)">
 											</app-jql-group-columns>
 										</div>
@@ -111,46 +79,27 @@
 								}
 							</div>
 
-							<!-- Generated / editable JQL -->
-							<h3 class="h6 fw-semibold mt-2">
-								Generated JQL (editable)
-							</h3>
+							<h3 class="h6 fw-semibold mt-2">Generated JQL (editable)</h3>
 
-							@if (jql) {
+							@if (generatedJql()) {
 								<textarea class="form-control font-monospace mb-2"
 										  rows="5"
-										  [(ngModel)]="manualQuery">
-								</textarea>
+										  [ngModel]="manualQuery()"
+										  (ngModelChange)="manualQuery.set($event)">
+                         </textarea>
 
 								<div class="d-flex justify-content-between align-items-center">
-									<button class="btn btn-outline-danger"
-											type="button"
-											(click)="resetQuery()">
-										Reset query
-									</button>
-
-									<app-copy-to-clipboard-btn
-											[textToCopy]="manualQuery || jql">
-									</app-copy-to-clipboard-btn>
+									<button class="btn btn-outline-danger" (click)="resetQuery()">Reset</button>
+									<app-copy-to-clipboard-btn [textToCopy]="manualQuery() || generatedJql()"></app-copy-to-clipboard-btn>
 								</div>
-							} @else {
-								<p class="text-muted">
-									Select at least one value to generate a JQL query.
-								</p>
 							}
-
 						} @else {
-							<p class="text-muted">
-								No configuration loaded yet. Go to the
-								<strong>Config</strong> tab and apply a CSV first.
-							</p>
+							<p class="text-muted">No configuration loaded yet.</p>
 						}
 					</div>
 				</ng-template>
 			</li>
 		</ul>
-
-		<!-- Nav content outlet -->
 		<div [ngbNavOutlet]="nav"></div>
 	</div>
 </app-tool-layout>

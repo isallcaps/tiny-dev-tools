@@ -1,4 +1,4 @@
-// jql-utils.ts
+// jql.utils.ts
 import {
 	GroupedJqlConfig,
 	JqlConfigRow,
