@@ -17,12 +17,14 @@ export const LOREM_BUT_EXACT_TOOL:Tool = {
 		'Generate text at an exact character length to test input and textarea limits.',
 };
 
+export const JQL_BUT_REUSABLE_TOOL:Tool = {
+	id: TOOL_ID.JIRA_QUERY,
+	path: TOOL_ID.JIRA_QUERY,
+	title: 'JQL, but reusable',
+	description: 'Build JQL queries from saved field values instead of retyping the same Jira fields.',
+};
+
 export const TOOLS:readonly Tool[] = [
 	LOREM_BUT_EXACT_TOOL,
-	{
-		id: TOOL_ID.JIRA_QUERY,
-		path: TOOL_ID.JIRA_QUERY,
-		title: 'Jira Query',
-		disabled: true,
-	},
+	JQL_BUT_REUSABLE_TOOL,
 ] as const;

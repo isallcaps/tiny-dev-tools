@@ -1,8 +1,8 @@
 import {Routes} from '@angular/router';
 import {LoremButExact} from './lorem-but-exact/lorem-but-exact';
-import {JiraQuery} from './jira-query/jira-query';
+import {JqlButReusable} from './jql-but-reusable/jql-but-reusable';
 import {Home} from './home/home';
-import {LOREM_BUT_EXACT_TOOL} from './shared/constants/tools.constants';
+import {JQL_BUT_REUSABLE_TOOL, LOREM_BUT_EXACT_TOOL} from './shared/constants/tools.constants';
 
 export const routes:Routes = [
 	{
@@ -15,9 +15,9 @@ export const routes:Routes = [
 		component: LoremButExact,
 		title: LOREM_BUT_EXACT_TOOL.title
 	}, {
-		path: 'jira-query',
-		component: JiraQuery,
-		title: 'Jira Query'
+		path: JQL_BUT_REUSABLE_TOOL.path,
+		component: JqlButReusable,
+		title: JQL_BUT_REUSABLE_TOOL.title
 	},
 	{path: '**', redirectTo: ''}
 ];
