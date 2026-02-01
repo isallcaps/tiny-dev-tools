@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {Tool} from '../../constants/tools.constants';
+import {Tool} from '../../../core/constants/tools.constants';
 
 @Component({
 	selector: 'app-tool-layout',

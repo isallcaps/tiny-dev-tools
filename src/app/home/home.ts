@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
-import {RouterLink} from "@angular/router";
-import {Tool, TOOLS} from "../shared/constants/tools.constants";
+import {RouterLink} from '@angular/router';
+import {Tool, TOOLS} from '../core/constants/tools.constants';
 
 @Component({
 	selector: 'app-home',
@@ -53,5 +53,5 @@ import {Tool, TOOLS} from "../shared/constants/tools.constants";
 	styles: ``,
 })
 export class Home {
-	readonly tools: readonly Tool[] = TOOLS;
+	readonly tools:readonly Tool[] = TOOLS;
 }

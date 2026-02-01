@@ -1,6 +1,6 @@
 import {Component, inject, TemplateRef} from '@angular/core';
 import {NgbOffcanvas, NgbOffcanvasModule} from '@ng-bootstrap/ng-bootstrap';
-import {Tool, TOOLS} from '../shared/constants/tools.constants';
+import {Tool, TOOLS} from '../core/constants/tools.constants';
 import {RouterLink, RouterLinkActive} from '@angular/router';
 
 @Component({
@@ -12,9 +12,8 @@ import {RouterLink, RouterLinkActive} from '@angular/router';
 	],
 	template: `
 		<!-- Hamburger button -->
-		<button
-				type="button"
-				class="btn btn-outline-secondary d-inline-flex align-items-center gap-1"
+		<button type="button"
+				class="btn btn-outline-secondary d-inline-flex align-items-center gap-1 btn-open-menu"
 				(click)="open(menu)"
 				aria-label="Open tool menu">
 			<!-- Simple icon: three lines -->
@@ -55,7 +54,11 @@ import {RouterLink, RouterLinkActive} from '@angular/router';
 
 
 	`,
-	styles: ``,
+	styles: `
+      .btn-open-menu {
+        min-height: 20px;
+      }
+	`,
 })
 export class NavMenu {
 	private readonly offcanvasService = inject(NgbOffcanvas);

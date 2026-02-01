@@ -1,10 +1,10 @@
 <app-tool-layout [tool]="tool">
 	<div class="card">
 		<!-- Nav tabs -->
-		<ul #nav="ngbNav" [(activeId)]="activeTab"
-			class="nav nav-tabs px-3 pt-3" ngbNav>
-			<li [ngbNavItem]="'config'" class="nav-item">
-				<button class="nav-link" ngbNavLink type="button">
+		<ul class="nav nav-tabs px-3 pt-3" [(activeId)]="activeTab"
+			#nav="ngbNav" ngbNav>
+			<li class="nav-item" [ngbNavItem]="'config'">
+				<button class="nav-link" type="button" ngbNavLink>
 					Config
 				</button>
 				<ng-template ngbNavContent>
@@ -13,9 +13,8 @@
 						<div class="d-flex justify-content-between align-items-center mb-2">
 							<h2 class="h6 mb-0">CSV configuration</h2>
 
-							<button (click)="clearLocalConfig()"
-									class="btn btn-sm btn-outline-danger"
-									type="button">
+							<button class="btn btn-outline-danger" type="button"
+									(click)="clearLocalConfig()">
 								Clear
 							</button>
 						</div>
@@ -27,37 +26,47 @@
 							locally in your browser.
 						</p>
 
-						<!-- File upload -->
 						<div class="mb-2 d-flex align-items-center gap-2">
-							<label class="btn btn-outline-secondary btn-sm mb-0">
-								Upload CSV
-								<input (change)="onFileSelected($event)"
-									   accept=".csv,text/csv"
-									   class="d-none"
-									   type="file"/>
+							<label class="btn btn-outline-secondary mb-0">
+								<i class="bi bi-file-arrow-up-fill"></i> Upload CSV
+								<input class="d-none"
+									   type="file" (change)="onFileSelected($event)"
+									   accept=".csv,text/csv"/>
 							</label>
 
 							@if (csvFileName) {
-								<span class="text-muted small">
-									Loaded: {{ csvFileName }}
+								<span class="text-success small">
+									File loaded: {{ csvFileName }}
 								</span>
 							}
 						</div>
 
 						<!-- CSV textarea -->
-						<textarea
-								[(ngModel)]="csvInput"
-								class="form-control mb-2 font-monospace"
-								placeholder="jiraField,jiraValue,description,group&#10;project,Dev-1234,Dev ToolKit,&#10;component,Core,,&#10;labels,Home,,UI Screen&#10;labels,App,,UI Screen&#10;Epic Link,Dev-9834,Initial Setup,"
-								rows="10">
-						</textarea>
+						<div class="mb-3">
+							<textarea
+									class="form-control mb-2 font-monospace"
+									id="ta_csv"
+									placeholder="Paste CSV here or upload a file" rows="10"
+									[(ngModel)]="csvInput"></textarea>
+						</div>
 
 						<!-- Apply -->
-						<div class="d-flex justify-content-end mt-2">
-							<button (click)="onApplyCsv()"
-									class="btn btn-outline-primary btn-sm"
-									type="button">
-								Apply CSV
+						<div class="d-flex justify-content-between align-items-center mt-2">
+							<div>
+								<p class="text-muted small mb-2">
+									Not sure where to start? Load a sample and tweak it.
+								</p>
+
+								<button class="btn btn-outline-secondary"
+										type="button"
+										(click)="loadSampleCsv()">
+									Load sample CSV
+								</button>
+							</div>
+
+							<button class="btn btn-success" type="button"
+									(click)="onApplyCsv()" [disabled]="!csvInput || !csvInput.trim()">
+								<i class="bi bi-check"></i> Apply CSV
 							</button>
 						</div>
 
@@ -72,7 +81,7 @@
 			</li>
 
 			<li [ngbNavItem]="'query'">
-				<button class="nav-link" ngbNavLink type="button">
+				<button class="nav-link" type="button" ngbNavLink>
 					Query
 				</button>
 				<ng-template ngbNavContent>
@@ -85,65 +94,22 @@
 							<div class="mb-3 container-fluid" style="max-height: 500px; overflow-y: auto;">
 								@for (field of fieldKeys; track field) {
 									<div class="row mb-2 border-bottom">
-										<div class="col-2">
+										<div class="col-12 col-md-3 col-lg-2">
 											<h3 class="fw-light fs-5">
 												{{ field }}
 											</h3>
 										</div>
 										<div class="col">
-											<!-- Ungrouped values -->
-											@for (item of grouped[field]?.ungrouped ?? []; track item.jiraValue) {
-												<div class="form-check">
-													<input type="checkbox"
-														   (change)="toggleSelection(field,item.jiraValue,$any($event.target).checked)"
-														   [checked]="isSelected(field, item.jiraValue)"
-														   class="form-check-input"
-														   id="cb_{{ field }}_{{ item.jiraValue }}"/>
-
-													<label class="form-check-label"
-														   for="cb_{{ field }}_{{ item.jiraValue }}">
-															<span class="fw-bold font-monospace">
-																{{ item.jiraValue }}
-															</span>
-														@if (item.description) {
-															<span class="fw-light text-secondary"> - {{ item.description }}</span>
-														}
-													</label>
-												</div>
-											}
-
-											<!-- Explicit groups (from CSV) -->
-											@for (groupName of groupKeys(field); track groupName) {
-												<div class="mt-2">
-													<h4 class="fs-6 mb-1">
-														{{ groupName }}
-													</h4>
-
-													@for (item of grouped[field]?.groups?.[groupName] ?? []; track item.jiraValue) {
-														<div class="form-check">
-															<input type="checkbox"
-																   (change)="toggleSelection(field,item.jiraValue,$any($event.target).checked)"
-																   [checked]="isSelected(field, item.jiraValue)"
-																   class="form-check-input"
-																   id="cb_{{ field }}_{{ groupName }}_{{ item.jiraValue }}"/>
-															<label class="form-check-label"
-																   for="cb_{{ field }}_{{ groupName }}_{{ item.jiraValue }}">
-																<span class="fw-bold font-monospace">{{ item.jiraValue }}</span>
-																@if (item.description) {
-																	<span class="fw-light text-secondary"> - {{ item.description }}</span>
-																}
-															</label>
-														</div>
-													}
-												</div>
-											}
+											<app-jql-group-columns
+													[field]="field"
+													[fieldConfig]="grouped[field]"
+													[selectionsForField]="selections[field] || {}"
+													(selectionChange)="onFieldSelectionChange($event)">
+											</app-jql-group-columns>
 										</div>
 									</div>
-
-
 								}
 							</div>
-
 
 							<!-- Generated / editable JQL -->
 							<h3 class="h6 fw-semibold mt-2">
@@ -151,17 +117,15 @@
 							</h3>
 
 							@if (jql) {
-								<textarea
-										[(ngModel)]="manualQuery"
-										class="form-control font-monospace mb-2"
-										rows="5">
+								<textarea class="form-control font-monospace mb-2"
+										  rows="5"
+										  [(ngModel)]="manualQuery">
 								</textarea>
 
 								<div class="d-flex justify-content-between align-items-center">
-									<button
-											(click)="resetQuery()"
-											class="btn btn-outline-secondary btn-sm"
-											type="button">
+									<button class="btn btn-outline-danger"
+											type="button"
+											(click)="resetQuery()">
 										Reset query
 									</button>
 

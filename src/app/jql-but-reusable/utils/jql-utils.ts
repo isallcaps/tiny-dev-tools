@@ -3,7 +3,7 @@ import {
 	GroupedJqlConfig,
 	JqlConfigRow,
 	SelectionMap,
-} from '../models/jql-config.model';
+} from '../models/jql.model';
 
 export function parseJqlCsv(csv:string):JqlConfigRow[] {
 	const lines = csv

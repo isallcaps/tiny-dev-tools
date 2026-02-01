@@ -3,7 +3,7 @@ import {LoremIpsum} from './lorem-ipsum';
 import {FormsModule} from '@angular/forms';
 import {NgbDropdown, NgbDropdownItem, NgbDropdownMenu, NgbDropdownToggle} from '@ng-bootstrap/ng-bootstrap';
 import {CopyToClipboardBtn} from '../shared/components/copy-to-clipboard-btn/copy-to-clipboard-btn';
-import {LOREM_BUT_EXACT_TOOL} from '../shared/constants/tools.constants';
+import {LOREM_BUT_EXACT_TOOL} from '../core/constants/tools.constants';
 import {ToolLayout} from '../shared/components/tool-layout/tool-layout';
 
 
@@ -21,7 +21,7 @@ import {ToolLayout} from '../shared/components/tool-layout/tool-layout';
 	template: `
 		<app-tool-layout [tool]="tool">
 			<div class="row">
-				<div class="col-2">
+				<div class="col-md-2">
 					<div class="mb-3">
 						<label for="input-number" class="form-label">Number</label>
 						<div class="input-group">

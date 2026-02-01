@@ -1,11 +1,12 @@
 import {Component, OnInit} from '@angular/core';
-import {JQL_BUT_REUSABLE_TOOL} from '../shared/constants/tools.constants';
+import {JQL_BUT_REUSABLE_TOOL} from '../core/constants/tools.constants';
 import {ToolLayout} from '../shared/components/tool-layout/tool-layout';
 import {CopyToClipboardBtn} from '../shared/components/copy-to-clipboard-btn/copy-to-clipboard-btn';
 import {FormsModule} from '@angular/forms';
-import {GroupedJqlConfig, SelectionMap} from '../shared/models/jql-config.model';
-import {buildJqlFromSelection, groupRows, parseJqlCsv} from '../shared/utils/jql-utils';
+import {GroupedJqlConfig, SelectionMap} from './models/jql.model';
+import {buildJqlFromSelection, groupRows, parseJqlCsv} from './utils/jql-utils';
 import {NgbNavModule} from '@ng-bootstrap/ng-bootstrap';
+import {FieldSelectionChange, GroupColumnComponent} from './components/jql-group-columns/jql-group-columns';
 
 const LOCAL_STORAGE_ROWS_KEY = 'tiny-dev-tools:jql-config-rows';
 const LOCAL_STORAGE_SELECTIONS_KEY = 'tiny-dev-tools:jql-selections';
@@ -17,7 +18,8 @@ const LOCAL_STORAGE_SELECTIONS_KEY = 'tiny-dev-tools:jql-selections';
 		ToolLayout,
 		CopyToClipboardBtn,
 		FormsModule,
-		NgbNavModule
+		NgbNavModule,
+		GroupColumnComponent
 	],
 	templateUrl: 'jql-but-reusable.html',
 	styles: ``,
@@ -104,6 +106,26 @@ export class JqlButReusable implements OnInit {
 		this.activeTab = 'query';
 	}
 
+	loadSampleCsv():void {
+		if (this.csvInput.trim()) {
+			const ok = confirm('Replace the current CSV with a sample?');
+			if (!ok) return;
+		}
+
+		this.csvFileName = 'sample-jira-config.csv';
+		this.csvInput = `jiraField,jiraValue,description,group
+project,DEV,Main dev project,
+component,Core,Shared core logic,
+component,UI,User-facing stuff,
+"Epic Link",DEV-42,The big thing we’re working on,
+labels,cleanup,Tech debt nobody loves,
+labels,frontend,All things UI,
+labels,home,Home screen,UI Screens
+labels,settings,Settings screen,UI Screens
+`;
+	}
+
+
 	loadFromLocalStorage():void {
 		try {
 			const storedRows = localStorage.getItem(LOCAL_STORAGE_ROWS_KEY);
@@ -135,7 +157,6 @@ export class JqlButReusable implements OnInit {
 	}
 
 	/* ---------- Selection helpers ---------- */
-
 	private initSelectionsFromGrouped(defaultChecked = false):void {
 		const selections:SelectionMap = {};
 
@@ -195,8 +216,8 @@ export class JqlButReusable implements OnInit {
 		}
 	}
 
-	isSelected(field:string, value:string):boolean {
-		return !!this.selections[field]?.[value];
+	onFieldSelectionChange(evt:FieldSelectionChange):void {
+		this.toggleSelection(evt.field, evt.value, evt.checked);
 	}
 
 	toggleSelection(field:string, value:string, checked:boolean):void {
@@ -213,8 +234,6 @@ export class JqlButReusable implements OnInit {
 		// Whenever structure/selection changes, reset manual query base
 		this.manualQuery = this.jql;
 	}
-
-	/* ---------- New: Clear + Reset actions ---------- */
 
 	/** Clears all local config + selections + query */
 	clearLocalConfig():void {

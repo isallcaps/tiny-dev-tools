@@ -11,15 +11,11 @@ Live site (GitHub Pages):
 
 ## What is this?
 
-**Tiny Dev Tools** is a lightweight Angular app that hosts small utilities for developers and designers.
+**Tiny Dev Tools** is a lightweight Angular app that hosts small, focused utilities for developers and designers.
 
-These are not big platforms or frameworks — they’re intentionally narrow tools that solve one problem well.
+Built on the “work smarter, not harder” philosophy - because if a tool can save me time, I don’t want to do it the long
+way ever again.
 
-Think:
-
-- “I just need this one thing.”
-- “I don’t want to install anything.”
-- “I want to paste something, click a button, and move on with my life.”
 
 ---
 
@@ -62,8 +58,6 @@ things.
 ## Tech stack
 
 - Angular (v21)
-- Standalone components
-- Modern Angular control flow (`@if`, `@for`)
 - Bootstrap + ng-bootstrap
 - No backend
 - No tracking
@@ -94,5 +88,3 @@ Build command:
 ```bash
 ng build --base-href /tiny-dev-tools/
 ```
-
-The compiled output is committed to the `docs/` folder and served from the main branch.
