@@ -1,9 +1,10 @@
-import {GroupedJqlConfig, JqlConfigRow, SelectionMap} from '../models/jql-config.model';
+// jql-utils.ts
+import {
+	GroupedJqlConfig,
+	JqlConfigRow,
+	SelectionMap,
+} from '../models/jql-config.model';
 
-/**
- * Parse CSV text into JqlConfigRow objects.
- * Expected header: jiraField,jiraValue,description,group
- */
 export function parseJqlCsv(csv:string):JqlConfigRow[] {
 	const lines = csv
 		.split(/\r?\n/)
@@ -32,14 +33,15 @@ export function parseJqlCsv(csv:string):JqlConfigRow[] {
 
 		const jiraField = cols[idxField];
 		const jiraValue = cols[idxValue];
-
 		if (!jiraField || !jiraValue) return acc;
 
 		acc.push({
 			jiraField,
 			jiraValue,
-			description: idxDescription >= 0 ? cols[idxDescription] || undefined : undefined,
-			group: idxGroup >= 0 ? cols[idxGroup] || undefined : undefined,
+			description:
+				idxDescription >= 0 ? cols[idxDescription] || undefined : undefined,
+			group:
+				idxGroup >= 0 ? cols[idxGroup] || undefined : undefined,
 		});
 
 		return acc;
@@ -47,28 +49,40 @@ export function parseJqlCsv(csv:string):JqlConfigRow[] {
 }
 
 /**
- * Group rows by jiraField, then by group name.
- * Empty group becomes "General".
+ * Group rows by jiraField, then into ungrouped + named groups.
  */
 export function groupRows(rows:JqlConfigRow[]):GroupedJqlConfig {
 	const grouped:GroupedJqlConfig = {};
 
 	for (const row of rows) {
 		const field = row.jiraField;
-		const groupName = row.group?.trim() || 'General';
 
-		grouped[field] ??= {};
-		grouped[field][groupName] ??= [];
+		if (!grouped[field]) {
+			grouped[field] = {
+				ungrouped: [],
+				groups: {},
+			};
+		}
 
-		grouped[field][groupName].push(row);
+		const groupName = row.group?.trim();
+
+		if (groupName) {
+			if (!grouped[field].groups[groupName]) {
+				grouped[field].groups[groupName] = [];
+			}
+			grouped[field].groups[groupName].push(row);
+		}
+		else {
+			grouped[field].ungrouped.push(row);
+		}
 	}
 
 	return grouped;
 }
 
 /**
- * Build a JQL query string from grouped config + selections.
- * Group names are UI-only and ignored.
+ * Build a JQL string from grouped config + selections.
+ * Group labels are UI-only.
  */
 export function buildJqlFromSelection(
 	grouped:GroupedJqlConfig,
@@ -77,13 +91,22 @@ export function buildJqlFromSelection(
 	const clauses:string[] = [];
 
 	for (const field of Object.keys(grouped)) {
-		const groups = grouped[field];
+		const fieldConfig = grouped[field];
 		const selectedValues:string[] = [];
 
-		for (const groupName of Object.keys(groups)) {
-			for (const row of groups[groupName]) {
+		// Ungrouped
+		for (const row of fieldConfig.ungrouped) {
+			const value = row.jiraValue.trim();
+			if (value && selections[field]?.[value]) {
+				selectedValues.push(value);
+			}
+		}
+
+		// Grouped
+		for (const groupName of Object.keys(fieldConfig.groups)) {
+			for (const row of fieldConfig.groups[groupName]) {
 				const value = row.jiraValue.trim();
-				if (selections[field]?.[value]) {
+				if (value && selections[field]?.[value]) {
 					selectedValues.push(value);
 				}
 			}
@@ -93,27 +116,25 @@ export function buildJqlFromSelection(
 
 		const uniqueValues = Array.from(new Set(selectedValues)).sort();
 
-		// Quote field names with spaces or non-word chars (e.g. "Epic Link")
-		const renderedField =
-			/[^\w]/.test(field) ? `"${field}"` : field;
+		// Quote field names with spaces / non-word chars (e.g. "Epic Link")
+		const needsFieldQuotes = /[^\w]/.test(field);
+		const renderedField = needsFieldQuotes ? `"${field}"` : field;
 
 		if (uniqueValues.length === 1) {
 			const v = uniqueValues[0];
 			clauses.push(
-				`${renderedField} = ${quoteIfNeeded(v)}`
+				`${renderedField} = ${quoteIfNeeded(v)}`,
 			);
 		}
 		else {
 			clauses.push(
-				`${renderedField} in (${uniqueValues.map(quoteIfNeeded).join(', ')})`
+				`${renderedField} in (${uniqueValues.map(quoteIfNeeded).join(', ')})`,
 			);
 		}
 	}
 
 	return clauses.join(' AND ');
 }
-
-/* ---------- helpers ---------- */
 
 function quoteIfNeeded(value:string):string {
 	return /[\s-]/.test(value) ? `"${value}"` : value;

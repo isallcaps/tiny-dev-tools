@@ -8,7 +8,10 @@ export interface JqlConfigRow {
 // field → groupName → rows
 export interface GroupedJqlConfig {
 	[field:string]:{
-		[groupName:string]:JqlConfigRow[];
+		ungrouped:JqlConfigRow[];
+		groups:{
+			[groupName:string]:JqlConfigRow[];
+		};
 	};
 }
 

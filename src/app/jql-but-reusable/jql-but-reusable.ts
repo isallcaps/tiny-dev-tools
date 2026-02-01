@@ -5,6 +5,7 @@ import {CopyToClipboardBtn} from '../shared/components/copy-to-clipboard-btn/cop
 import {FormsModule} from '@angular/forms';
 import {GroupedJqlConfig, SelectionMap} from '../shared/models/jql-config.model';
 import {buildJqlFromSelection, groupRows, parseJqlCsv} from '../shared/utils/jql-utils';
+import {NgbNavModule} from '@ng-bootstrap/ng-bootstrap';
 
 const LOCAL_STORAGE_ROWS_KEY = 'tiny-dev-tools:jql-config-rows';
 const LOCAL_STORAGE_SELECTIONS_KEY = 'tiny-dev-tools:jql-selections';
@@ -15,7 +16,8 @@ const LOCAL_STORAGE_SELECTIONS_KEY = 'tiny-dev-tools:jql-selections';
 	imports: [
 		ToolLayout,
 		CopyToClipboardBtn,
-		FormsModule
+		FormsModule,
+		NgbNavModule
 	],
 	templateUrl: 'jql-but-reusable.html',
 	styles: ``,
@@ -35,7 +37,7 @@ export class JqlButReusable implements OnInit {
 	// Editable query text bound to the textarea
 	manualQuery = '';
 
-	showConfig = true;
+	activeTab:'config' | 'query' = 'config';
 
 	ngOnInit():void {
 		this.loadFromLocalStorage();
@@ -48,16 +50,12 @@ export class JqlButReusable implements OnInit {
 
 	/** Group names for a given field */
 	groupKeys(field:string):string[] {
-		return Object.keys(this.grouped[field] ?? {});
+		return Object.keys(this.grouped[field]?.groups ?? {});
 	}
 
 	/** Generated JQL string based on grouped config + selections */
 	get jql():string {
 		return buildJqlFromSelection(this.grouped, this.selections);
-	}
-
-	toggleConfig():void {
-		this.showConfig = !this.showConfig;
 	}
 
 	/* ---------- File / CSV handling ---------- */
@@ -88,6 +86,7 @@ export class JqlButReusable implements OnInit {
 
 			localStorage.removeItem(LOCAL_STORAGE_ROWS_KEY);
 			localStorage.removeItem(LOCAL_STORAGE_SELECTIONS_KEY);
+			this.activeTab = 'config';
 			return;
 		}
 
@@ -102,7 +101,7 @@ export class JqlButReusable implements OnInit {
 
 		// Start manual query from the generated one
 		this.manualQuery = this.jql;
-		this.showConfig = false;
+		this.activeTab = 'query';
 	}
 
 	loadFromLocalStorage():void {
@@ -127,6 +126,9 @@ export class JqlButReusable implements OnInit {
 
 			// Initialize manual query from the generated one
 			this.manualQuery = this.jql;
+			if (Object.keys(this.grouped).length) {
+				this.activeTab = 'query';
+			}
 		} catch (e) {
 			console.warn('Failed to load JQL config from localStorage', e);
 		}
@@ -138,11 +140,20 @@ export class JqlButReusable implements OnInit {
 		const selections:SelectionMap = {};
 
 		for (const field of Object.keys(this.grouped)) {
+			const fieldConfig = this.grouped[field];
 			const fieldSelections:{ [jiraValue:string]:boolean } = {};
-			const groups = this.grouped[field];
 
-			for (const groupName of Object.keys(groups)) {
-				for (const row of groups[groupName]) {
+			// Ungrouped
+			for (const row of fieldConfig.ungrouped ?? []) {
+				if (!(row.jiraValue in fieldSelections)) {
+					fieldSelections[row.jiraValue] = defaultChecked;
+				}
+			}
+
+			// Grouped
+			for (const groupName of Object.keys(fieldConfig.groups ?? {})) {
+				const rows = fieldConfig.groups[groupName] ?? [];
+				for (const row of rows) {
 					if (!(row.jiraValue in fieldSelections)) {
 						fieldSelections[row.jiraValue] = defaultChecked;
 					}
@@ -157,16 +168,27 @@ export class JqlButReusable implements OnInit {
 
 	private ensureSelectionsCoverGrouped():void {
 		for (const field of Object.keys(this.grouped)) {
+			const fieldConfig = this.grouped[field];
+
 			if (!this.selections[field]) {
 				this.selections[field] = {};
 			}
 
-			const groups = this.grouped[field];
+			const fieldSelections = this.selections[field];
 
-			for (const groupName of Object.keys(groups)) {
-				for (const row of groups[groupName]) {
-					if (typeof this.selections[field][row.jiraValue] === 'undefined') {
-						this.selections[field][row.jiraValue] = false;
+			// Ungrouped
+			for (const row of fieldConfig.ungrouped ?? []) {
+				if (typeof fieldSelections[row.jiraValue] === 'undefined') {
+					fieldSelections[row.jiraValue] = false;
+				}
+			}
+
+			// Grouped
+			for (const groupName of Object.keys(fieldConfig.groups ?? {})) {
+				const rows = fieldConfig.groups[groupName] ?? [];
+				for (const row of rows) {
+					if (typeof fieldSelections[row.jiraValue] === 'undefined') {
+						fieldSelections[row.jiraValue] = false;
 					}
 				}
 			}
@@ -201,9 +223,9 @@ export class JqlButReusable implements OnInit {
 		this.csvInput = '';
 		this.csvFileName = '';
 		this.manualQuery = '';
-		this.showConfig = true;
 		localStorage.removeItem(LOCAL_STORAGE_ROWS_KEY);
 		localStorage.removeItem(LOCAL_STORAGE_SELECTIONS_KEY);
+		this.activeTab = 'config';
 	}
 
 	/** Reset editable query back to the current generated JQL */

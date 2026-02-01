@@ -1,80 +1,62 @@
 <app-tool-layout [tool]="tool">
-	<div class="row g-4">
-
-		<!-- ===================== -->
-		<!-- Left: CSV configuration -->
-		<!-- ===================== -->
-		<!-- ===================== -->
-		<!-- Left: CSV configuration (collapsible) -->
-		<!-- ===================== -->
-		<div class="col-12 col-lg-6">
-			<div class="card h-100">
-
-				<!-- Card header with toggle -->
-				<div class="card-header d-flex justify-content-between align-items-center">
-					<h2 class="h6 mb-0">CSV configuration</h2>
-
-					<button
-							type="button"
-							class="btn btn-sm btn-link text-decoration-none"
-							(click)="toggleConfig()">
-						@if (showConfig) {
-							Hide
-						} @else {
-							Show
-						}
-					</button>
-				</div>
-
-				<!-- Only show body when expanded -->
-				@if (showConfig) {
+	<div class="card">
+		<!-- Nav tabs -->
+		<ul #nav="ngbNav" [(activeId)]="activeTab"
+			class="nav nav-tabs px-3 pt-3" ngbNav>
+			<li [ngbNavItem]="'config'" class="nav-item">
+				<button class="nav-link" ngbNavLink type="button">
+					Config
+				</button>
+				<ng-template ngbNavContent>
+					<!-- Config tab content -->
 					<div class="card-body">
+						<div class="d-flex justify-content-between align-items-center mb-2">
+							<h2 class="h6 mb-0">CSV configuration</h2>
+
+							<button (click)="clearLocalConfig()"
+									class="btn btn-sm btn-outline-danger"
+									type="button">
+								Clear
+							</button>
+						</div>
+
 						<p class="text-muted small">
 							Paste a CSV with
 							<code>jiraField,jiraValue,description,group</code>
-							as the header row, or upload a CSV file.
-							Values are stored locally in your browser.
+							as the header row, or upload a CSV file. Values are stored
+							locally in your browser.
 						</p>
 
 						<!-- File upload -->
 						<div class="mb-2 d-flex align-items-center gap-2">
 							<label class="btn btn-outline-secondary btn-sm mb-0">
 								Upload CSV
-								<input
-										type="file"
-										accept=".csv,text/csv"
-										class="d-none"
-										(change)="onFileSelected($event)"/>
+								<input (change)="onFileSelected($event)"
+									   accept=".csv,text/csv"
+									   class="d-none"
+									   type="file"/>
 							</label>
 
 							@if (csvFileName) {
 								<span class="text-muted small">
-							Loaded: {{ csvFileName }}
-						</span>
+									Loaded: {{ csvFileName }}
+								</span>
 							}
 						</div>
 
 						<!-- CSV textarea -->
 						<textarea
-								class="form-control mb-2 font-monospace"
-								rows="6"
 								[(ngModel)]="csvInput"
-								placeholder="jiraField,jiraValue,description,group&#10;project,Dev-1234,Dev ToolKit,&#10;component,Core,,&#10;labels,Home,,UI Screen&#10;labels,App,,UI Screen&#10;Epic Link,Dev-9834,Initial Setup,">
-				</textarea>
+								class="form-control mb-2 font-monospace"
+								placeholder="jiraField,jiraValue,description,group&#10;project,Dev-1234,Dev ToolKit,&#10;component,Core,,&#10;labels,Home,,UI Screen&#10;labels,App,,UI Screen&#10;Epic Link,Dev-9834,Initial Setup,"
+								rows="10">
+						</textarea>
 
-						<!-- Actions -->
-						<div class="d-flex justify-content-between align-items-center mt-2">
-							<button
-									type="button"
-									class="btn btn-outline-danger btn-sm"
-									(click)="clearLocalConfig()">
-								Clear local config
-							</button>
-
-							<button
-									type="button"
+						<!-- Apply -->
+						<div class="d-flex justify-content-end mt-2">
+							<button (click)="onApplyCsv()"
 									class="btn btn-outline-primary btn-sm"
-									(click)="onApplyCsv()">
+									type="button">
 								Apply CSV
 							</button>
 						</div>
@@ -86,110 +68,125 @@
 							</p>
 						}
 					</div>
-				}
-			</div>
-		</div>
+				</ng-template>
+			</li>
 
+			<li [ngbNavItem]="'query'">
+				<button class="nav-link" ngbNavLink type="button">
+					Query
+				</button>
+				<ng-template ngbNavContent>
+					<!-- Query tab content -->
+					<div class="card-body d-flex flex-column">
+						<h2 class="h6 fw-semibold mb-3">Values &amp; JQL</h2>
 
-		<!-- ===================== -->
-		<!-- Right: Values + JQL -->
-		<!-- ===================== -->
-		<div class="col-12 col-lg-6">
-			<div class="card h-100">
-				<div class="card-body d-flex flex-column">
-					<h2 class="h5 fw-semibold mb-3">Values &amp; JQL</h2>
-
-					@if (fieldKeys.length) {
-
-						<!-- Grouped values -->
-						<div class="mb-3" style="max-height: 260px; overflow-y: auto;">
-							@for (field of fieldKeys; track field) {
-								<div class="mb-3 border-bottom pb-2">
-									<h3 class="fw-light fs-5 mb-2">
-										{{ field }}
-									</h3>
-
-									@for (groupName of groupKeys(field); track groupName) {
-										<div class="mb-2">
-
-											@if (!(groupName === 'General' && groupKeys(field).length === 1)) {
-												<h4 class="fs-6 mb-1">
-													{{ groupName }}:
-												</h4>
-											}
-
-											@for (item of grouped[field][groupName]; track item.jiraValue) {
+						@if (fieldKeys.length) {
+							<!-- Grouped values -->
+							<div class="mb-3 container-fluid" style="max-height: 500px; overflow-y: auto;">
+								@for (field of fieldKeys; track field) {
+									<div class="row mb-2 border-bottom">
+										<div class="col-2">
+											<h3 class="fw-light fs-5">
+												{{ field }}
+											</h3>
+										</div>
+										<div class="col">
+											<!-- Ungrouped values -->
+											@for (item of grouped[field]?.ungrouped ?? []; track item.jiraValue) {
 												<div class="form-check">
-													<input
-															type="checkbox"
-															class="form-check-input"
-															id="cb_{{ field }}_{{ item.jiraValue }}"
-															[checked]="isSelected(field, item.jiraValue)"
-															(change)="toggleSelection(
-															field,
-															item.jiraValue,
-															$any($event.target).checked
-														)"/>
+													<input type="checkbox"
+														   (change)="toggleSelection(field,item.jiraValue,$any($event.target).checked)"
+														   [checked]="isSelected(field, item.jiraValue)"
+														   class="form-check-input"
+														   id="cb_{{ field }}_{{ item.jiraValue }}"/>
 
-													<label
-															class="form-check-label"
-															for="cb_{{ field }}_{{ item.jiraValue }}">
-														<span class="fw-bold font-monospace">
-															{{ item.jiraValue }}
-														</span>
-														@if (item.description) {
-															<span class="fw-light text-secondary">
-																- {{ item.description }}
+													<label class="form-check-label"
+														   for="cb_{{ field }}_{{ item.jiraValue }}">
+															<span class="fw-bold font-monospace">
+																{{ item.jiraValue }}
 															</span>
+														@if (item.description) {
+															<span class="fw-light text-secondary"> - {{ item.description }}</span>
 														}
 													</label>
 												</div>
 											}
+
+											<!-- Explicit groups (from CSV) -->
+											@for (groupName of groupKeys(field); track groupName) {
+												<div class="mt-2">
+													<h4 class="fs-6 mb-1">
+														{{ groupName }}
+													</h4>
+
+													@for (item of grouped[field]?.groups?.[groupName] ?? []; track item.jiraValue) {
+														<div class="form-check">
+															<input type="checkbox"
+																   (change)="toggleSelection(field,item.jiraValue,$any($event.target).checked)"
+																   [checked]="isSelected(field, item.jiraValue)"
+																   class="form-check-input"
+																   id="cb_{{ field }}_{{ groupName }}_{{ item.jiraValue }}"/>
+															<label class="form-check-label"
+																   for="cb_{{ field }}_{{ groupName }}_{{ item.jiraValue }}">
+																<span class="fw-bold font-monospace">{{ item.jiraValue }}</span>
+																@if (item.description) {
+																	<span class="fw-light text-secondary"> - {{ item.description }}</span>
+																}
+															</label>
+														</div>
+													}
+												</div>
+											}
 										</div>
-									}
-								</div>
-							}
-						</div>
+									</div>
 
-						<!-- Generated / editable query -->
-						<h3 class="h6 fw-semibold mt-2">
-							Generated JQL (editable)
-						</h3>
 
-						@if (jql) {
-							<textarea
-									class="form-control font-monospace mb-2"
-									rows="5"
-									[(ngModel)]="manualQuery">
-							</textarea>
-
-							<div class="d-flex justify-content-between align-items-center">
-								<button
-										type="button"
-										class="btn btn-outline-secondary btn-sm"
-										(click)="resetQuery()">
-									Reset query
-								</button>
-
-								<app-copy-to-clipboard-btn
-										[textToCopy]="manualQuery || jql">
-								</app-copy-to-clipboard-btn>
+								}
 							</div>
+
+
+							<!-- Generated / editable JQL -->
+							<h3 class="h6 fw-semibold mt-2">
+								Generated JQL (editable)
+							</h3>
+
+							@if (jql) {
+								<textarea
+										[(ngModel)]="manualQuery"
+										class="form-control font-monospace mb-2"
+										rows="5">
+								</textarea>
+
+								<div class="d-flex justify-content-between align-items-center">
+									<button
+											(click)="resetQuery()"
+											class="btn btn-outline-secondary btn-sm"
+											type="button">
+										Reset query
+									</button>
+
+									<app-copy-to-clipboard-btn
+											[textToCopy]="manualQuery || jql">
+									</app-copy-to-clipboard-btn>
+								</div>
+							} @else {
+								<p class="text-muted">
+									Select at least one value to generate a JQL query.
+								</p>
+							}
+
 						} @else {
 							<p class="text-muted">
-								Select at least one value to generate a JQL query.
+								No configuration loaded yet. Go to the
+								<strong>Config</strong> tab and apply a CSV first.
 							</p>
 						}
+					</div>
+				</ng-template>
+			</li>
+		</ul>
 
-					} @else {
-						<p class="text-muted">
-							Paste or upload a CSV on the left and click
-							<strong>Apply CSV</strong> to get started.
-						</p>
-					}
-				</div>
-			</div>
-		</div>
-
+		<!-- Nav content outlet -->
+		<div [ngbNavOutlet]="nav"></div>
 	</div>
 </app-tool-layout>
