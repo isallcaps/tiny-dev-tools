@@ -1,59 +1,80 @@
-# DevToolkit
+# Tiny Dev Tools
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.2.
+A small collection of focused, no-nonsense tools for very specific front-end and developer annoyances.
 
-## Development server
+Each tool exists because I personally needed it.
 
-To start a local development server, run:
+Live site (GitHub Pages):  
+👉 https://isallcaps.github.io/tiny-dev-tools/
+
+---
+
+## What is this?
+
+**Tiny Dev Tools** is a lightweight Angular app that hosts small utilities for developers and designers.
+
+These are not big platforms or frameworks — they’re intentionally narrow tools that solve one problem well.
+
+Think:
+
+- “I just need this one thing.”
+- “I don’t want to install anything.”
+- “I want to paste something, click a button, and move on with my life.”
+
+---
+
+## Current tools
+
+### ✏️ Lorem, but exact.
+
+Generate placeholder text at an **exact character count**.
+
+Useful for:
+
+- testing max character limits
+- form validation
+- UI truncation
+- error states
+- design mocks
+
+No guessing. No trimming. Just exactly the number of characters you need.
+
+---
+
+### 🧩 JQL, but reusable. *(in progress)*
+
+Build reusable Jira queries from CSV input.
+
+Features:
+
+- Paste or upload a CSV of Jira fields + values
+- Group values using a `group` column (purely for UI)
+- Select values via checkboxes
+- Auto-generate JQL
+- Edit the query manually before copying
+- Local storage persistence (nothing leaves your browser)
+
+Built for people who use labels, components, epics, etc. heavily and are tired of re-typing or re-checking the same
+things.
+
+---
+
+## Tech stack
+
+- Angular (v21)
+- Standalone components
+- Modern Angular control flow (`@if`, `@for`)
+- Bootstrap + ng-bootstrap
+- No backend
+- No tracking
+- No analytics
+
+Everything runs client-side.
+
+---
+
+## Local development
 
 ```bash
+npm install
 ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
