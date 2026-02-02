@@ -4,30 +4,52 @@
 		<div class="container d-flex align-items-center justify-content-between py-2">
 			<div class="d-flex align-items-center gap-2">
 				<app-nav-menu></app-nav-menu>
-
 				<a routerLink="/" class="text-decoration-none">
-					<span class="fw-bold">Tiny Dev Tools</span>
+					<app-brand customClass="fs-5"></app-brand>
 				</a>
 			</div>
+
+			<button class="btn btn-link text-body-secondary p-2" (click)="themeService.toggleTheme()" aria-label="Toggle Theme">
+				@if (themeService.theme() === 'light') {
+					<i class="bi bi-moon-stars-fill"></i>
+				} @else {
+					<i class="bi bi-sun-fill"></i>
+				}
+			</button>
 		</div>
 	</header>
-
 	<!-- Main -->
-	<main class="flex-fill py-4">
+	<main class="flex-fill py-4 bg-body">
 		<router-outlet></router-outlet>
 	</main>
 
 	<!-- Footer -->
-	<footer class="border-top bg-light">
-		<div class="container py-3 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
-			<span class="text-muted small">
-				Tiny Dev Tools · v{{ appVersion }} · small, opinionated utilities
-			</span>
+	<footer class="footer mt-auto py-5 border-top bg-body">
+		<div class="container">
+			<div class="row gy-4 align-items-center">
 
-			<a href="https://github.com/isallcaps/tiny-dev-tools"
-			   target="_blank" rel="noreferrer" class="text-muted small text-decoration-none">
-				View on GitHub
-			</a>
+				<div class="col-12 col-md-6 text-center text-md-start">
+					<app-brand customClass="fs-4"></app-brand>
+					<p class="text-body-secondary small mt-2 mb-0">
+						Small, opinionated utilities for the modern web.
+					</p>
+				</div>
+
+				<div class="col-12 col-md-6">
+					<div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-end align-items-center gap-3">
+						<a href="https://github.com/isallcaps/tiny-dev-tools"
+						   target="_blank"
+						   class="link-secondary text-decoration-none small d-flex align-items-center gap-1">
+							<i class="bi bi-github"></i> GitHub
+						</a>
+						<span class="text-body-tertiary d-none d-md-inline">|</span>
+						<span class="text-body-tertiary small">
+            v{{ appVersion }} · 2026
+          </span>
+					</div>
+				</div>
+
+			</div>
 		</div>
 	</footer>
 </div>

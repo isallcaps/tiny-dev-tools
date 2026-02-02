@@ -1,4 +1,4 @@
-# Tiny Dev Tools
+# \<TinyDevTools/>
 
 A small collection of focused, no-nonsense tools for very specific front-end and developer annoyances.
 
@@ -37,7 +37,7 @@ No guessing. No trimming. Just exactly the number of characters you need.
 
 ---
 
-### 🧩 JQL, but reusable. *(in progress)*
+### 🧩 JQL, but reusable.
 
 Build reusable Jira queries from CSV input.
 

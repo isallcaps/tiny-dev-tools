@@ -10,7 +10,7 @@ import {Tool} from '../../../core/constants/tools.constants';
 				<h1 class="fw-bold">{{ tool.title }}</h1>
 
 				@if (tool.description) {
-					<p class="text-muted">
+					<p class="text-body-secondary">
 						{{ tool.description }}
 					</p>
 				}

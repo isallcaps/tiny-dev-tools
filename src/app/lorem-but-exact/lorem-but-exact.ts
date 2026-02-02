@@ -78,7 +78,7 @@ import {ToolLayout} from '../shared/components/tool-layout/tool-layout';
                 </textarea>
 
 					<div class="mt-2 d-flex justify-content-end align-items-center">
-						<span class="me-2 text-muted small">{{ output().length }} / {{ characterLimit() }} Characters</span>
+						<span class="me-2 text-body-secondary small">{{ output().length }} / {{ characterLimit() }} Characters</span>
 						<app-copy-to-clipboard-btn [textToCopy]="output()"></app-copy-to-clipboard-btn>
 					</div>
 				</div>

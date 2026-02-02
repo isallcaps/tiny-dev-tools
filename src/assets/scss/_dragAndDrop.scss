@@ -4,19 +4,12 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-
-    // Aesthetic: Slight blur and themed background
-    background-color: rgba(var(--bs-primary-rgb), 0.05);
+    right: 0;
+    bottom: 0;
+    background: rgba(var(--bs-primary-rgb), 0.08); /* Soft purple tint */
     backdrop-filter: blur(2px);
-    border: 2px dashed var(--bs-primary);
-    border-radius: var(--bs-border-radius);
-
-    // Crucial: Allows drag/drop events to pass through to the textarea
-    pointer-events: none;
     z-index: 5;
-    transition: all 0.2s ease-in-out;
+    pointer-events: none;
   }
 }
 

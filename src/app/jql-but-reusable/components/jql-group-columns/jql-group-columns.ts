@@ -13,32 +13,20 @@ export interface FieldSelectionChange {
 	standalone: true,
 	imports: [JqlValueCheckbox],
 	template: `
-		<div class="row g-3">
-			@if (!hasGroups()) {
-				@if (fieldConfig().ungrouped?.length) {
-					<div class="col-12 col-md-6 col-lg-4">
-						@for (item of fieldConfig().ungrouped; track item.jiraValue) {
-							<app-jql-value-checkbox
-									[field]="field()"
-									[value]="item.jiraValue"
-									[description]="item.description"
-									[checked]="isSelected(item.jiraValue)"
-									(checkedChange)="onCheckboxChange(item.jiraValue, $event)">
-							</app-jql-value-checkbox>
-						}
-					</div>
-				}
-			} @else {
-				@if (fieldConfig().ungrouped?.length) {
-					<div class="col-12 col-md-6 col-lg-4">
-						<div class="mb-1 d-flex align-items-center gap-1 text-muted small">
-							<i class="bi bi-list-ul"></i>
-							<span>{{ ungroupedLabel }}</span>
-							<span class="badge bg-secondary-subtle text-secondary">
-                        {{ fieldConfig().ungrouped.length }}
-                      </span>
+		<div class="row g-4">
+			@if (fieldConfig().ungrouped?.length) {
+				<div class="col-12 col-md-6 col-lg-4">
+					@if (hasGroups()) {
+						<div class="mb-2 d-flex align-items-center gap-2 text-body-secondary small fw-bold">
+							<i class="bi bi-collection-fill opacity-50"></i>
+							<span class="text-uppercase tracking-wider">{{ ungroupedLabel }}</span>
+							<span class="badge rounded-pill bg-body-secondary text-body-secondary border px-2">
+                  {{ fieldConfig().ungrouped.length }}
+               </span>
 						</div>
+					}
 
+					<div class="checkbox-group-container">
 						@for (item of fieldConfig().ungrouped; track item.jiraValue) {
 							<app-jql-value-checkbox
 									[field]="field()"
@@ -49,29 +37,31 @@ export interface FieldSelectionChange {
 							</app-jql-value-checkbox>
 						}
 					</div>
-				}
+				</div>
 			}
 
 			@for (groupName of groupNames(); track groupName) {
 				<div class="col-12 col-md-6 col-lg-4">
-					<div class="mb-1 d-flex align-items-center gap-1 small fw-semibold">
-						<i class="bi bi-folder2-open"></i>
-						<span>{{ groupName }}</span>
-						<span class="badge bg-primary-subtle text-primary">
-                      {{ fieldConfig().groups?.[groupName]?.length ?? 0 }}
-                   </span>
+					<div class="mb-2 d-flex align-items-center gap-2 small fw-bold text-body">
+						<i class="bi bi-folder-fill text-primary opacity-75"></i>
+						<span class="text-uppercase tracking-wider">{{ groupName }}</span>
+						<span class="badge rounded-pill bg-primary-subtle text-primary-emphasis border border-primary-subtle px-2">
+               {{ fieldConfig().groups?.[groupName]?.length ?? 0 }}
+            </span>
 					</div>
 
-					@for (item of fieldConfig().groups?.[groupName] ?? []; track item.jiraValue) {
-						<app-jql-value-checkbox
-								[field]="field()"
-								[groupName]="groupName"
-								[value]="item.jiraValue"
-								[description]="item.description"
-								[checked]="isSelected(item.jiraValue)"
-								(checkedChange)="onCheckboxChange(item.jiraValue, $event)">
-						</app-jql-value-checkbox>
-					}
+					<div class="checkbox-group-container">
+						@for (item of fieldConfig().groups?.[groupName] ?? []; track item.jiraValue) {
+							<app-jql-value-checkbox
+									[field]="field()"
+									[groupName]="groupName"
+									[value]="item.jiraValue"
+									[description]="item.description"
+									[checked]="isSelected(item.jiraValue)"
+									(checkedChange)="onCheckboxChange(item.jiraValue, $event)">
+							</app-jql-value-checkbox>
+						}
+					</div>
 				</div>
 			}
 		</div>
