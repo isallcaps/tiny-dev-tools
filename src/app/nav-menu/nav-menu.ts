@@ -1,8 +1,8 @@
 import {Component, inject, TemplateRef} from '@angular/core';
 import {NgbOffcanvas, NgbOffcanvasModule} from '@ng-bootstrap/ng-bootstrap';
-import {Tool, TOOLS} from '../core/constants/tools.constants';
+import {Tool, TOOLS} from '@constants';
 import {RouterLink, RouterLinkActive} from '@angular/router';
-import {BrandComponent} from '../shared/components/brand/brand';
+import {BrandComponent} from '@shared';
 
 @Component({
 	selector: 'app-nav-menu',

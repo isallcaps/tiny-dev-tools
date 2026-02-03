@@ -1,0 +1,85 @@
+@use "../abstracts/variables" as vars;
+
+/* --- Light Mode Defaults --- */
+[data-bs-theme="light"] {
+  --bs-body-bg: #ffffff;
+  --bs-tertiary-bg: #f8f9fa;
+  --bs-border-color: #e0e0e0;
+
+  --bs-primary: #{vars.$primary-light};
+  --bs-primary-rgb: #{vars.$primary-light-rgb};
+  --bs-primary-text-emphasis: #{vars.$primary-light};
+
+
+  /* Subtle Surfaces */
+  --bs-primary-bg-subtle: #f3efff;
+  --bs-primary-border-subtle: #eaddff;
+  
+
+  /* Make the subtle areas very light purple so the #6200ee stands out */
+  --bs-primary-bg-subtle: rgba(98, 0, 238, 0.08);
+  --bs-primary-border-subtle: rgba(98, 0, 238, 0.15);
+}
+
+/* --- Dark Mode (The Google Pro Look) --- */
+[data-bs-theme="dark"] {
+  /* Re-paint everything for Dark Mode to stop the light purple leak */
+  --bs-primary: #{vars.$primary-dark};
+  --bs-primary-rgb: #{vars.$primary-dark-rgb};
+  --bs-primary-text-emphasis: #{vars.$primary-dark};
+
+  /* Subtle Surfaces for Dark Mode */
+  --bs-primary-bg-subtle: rgba(187, 134, 252, 0.15);
+  --bs-primary-border-subtle: rgba(187, 134, 252, 0.3);
+
+  /* Google Surfaces */
+  --bs-body-bg: #{vars.$google-gray};
+  --bs-tertiary-bg: #{vars.$google-gray-light};
+  --bs-body-color: #e8eaed;
+  --bs-secondary-color: #9aa0a6;
+  --bs-tertiary-color: #5f6368;
+  --bs-border-color: #3c4043;
+
+  /* Selection Glow */
+  ::selection {
+    background-color: rgba(187, 134, 252, 0.3);
+    color: #ffffff;
+  }
+}
+
+/* --- System-Level Overrides --- */
+
+/* Modern, Theme-Aware Scrollbars */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #dadce0 transparent;
+
+  &[data-bs-theme="dark"] {
+    scrollbar-color: #5f6368 transparent;
+  }
+}
+
+/* Webkit-specific fine-tuning (Chrome/Edge/Safari) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #dadce0;
+  border-radius: 20px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+[data-bs-theme="dark"] ::-webkit-scrollbar-thumb {
+  background-color: #5f6368;
+}
+
+/* Transitions for smooth theme switching */
+header, footer, main, .card {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}

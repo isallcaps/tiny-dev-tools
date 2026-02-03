@@ -1,0 +1,26 @@
+@use "sass:color";
+
+$primary-light: #6200ee; // Deep, Punchy Purple
+$primary-light-rgb: 98, 0, 238;
+
+$primary-dark: #bb86fc; // Electric / Neon Purple (Better for Dark Mode)
+$primary-dark-rgb: 187, 134, 252;
+
+
+// Your Electric Purple
+$tiny-purple: #6200ee;
+// The exact RGB for #6200ee is (98, 0, 238)
+$tiny-purple-rgb: 98, 0, 238;
+$tiny-purple-dark: #bb86fc;
+$google-gray: #202124;
+$google-gray-light: #3c4043;
+
+$font-main: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+
+$global-radius: 0.5rem;
+$label-weight: bold;
+$label-margin: 0.2rem;
+
+$code-bg: $google-gray;
+$badge-padding: 0.25rem 0.6rem;

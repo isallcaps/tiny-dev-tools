@@ -1,6 +1,3 @@
-import {JQL_BUT_REUSABLE_TOOL} from '../core/constants/tools.constants';
-import {ToolLayout} from '../shared/components/tool-layout/tool-layout';
-import {CopyToClipboardBtn} from '../shared/components/copy-to-clipboard-btn/copy-to-clipboard-btn';
 import {FormsModule} from '@angular/forms';
 import {GroupedJqlConfig, SelectionMap} from './models/jql.model';
 import {buildJqlFromSelection, groupRows, parseJqlCsv} from './utils/jql.utils';
@@ -8,8 +5,9 @@ import {NgbNavModule} from '@ng-bootstrap/ng-bootstrap';
 import {FieldSelectionChange, GroupColumnComponent} from './components/jql-group-columns/jql-group-columns';
 import {Component, OnInit, signal, computed, effect, inject, DestroyRef} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {readFileAsText} from '../shared/utils/file-reader.utils';
-import {DragAndDrop} from '../shared/directives/drag-and-drop';
+import {CopyToClipboardBtn, DragAndDrop, readFileAsText, ToolLayout} from '@shared';
+import {JQL_BUT_REUSABLE_TOOL} from '@constants';
+
 
 const LOCAL_STORAGE_ROWS_KEY = 'tiny-dev-tools:jql-config-rows';
 const LOCAL_STORAGE_SELECTIONS_KEY = 'tiny-dev-tools:jql-selections';

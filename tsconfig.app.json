@@ -6,7 +6,22 @@
     "outDir": "./out-tsc/app",
     "types": [
       "@angular/localize"
-    ]
+    ],
+    "baseUrl": "./",
+    "paths": {
+      "@constants": [
+        "src/app/constants/index.ts"
+      ],
+      "@core": [
+        "src/app/core/index.ts"
+      ],
+      "@shared": [
+        "src/app/shared/index.ts"
+      ],
+      "@styles/*": [
+        "src/scss/*"
+      ]
+    }
   },
   "include": [
     "src/**/*.ts"

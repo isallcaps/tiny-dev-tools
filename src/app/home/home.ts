@@ -1,8 +1,9 @@
 import {Component} from '@angular/core';
 import {RouterLink} from '@angular/router';
-import {Tool, TOOLS} from '../core/constants/tools.constants';
+import {Tool, TOOLS} from '@constants';
 import {NgClass} from '@angular/common';
-import {BrandComponent} from '../shared/components/brand/brand';
+import {BrandComponent} from '@shared';
+
 
 @Component({
 	selector: 'app-home',

@@ -39,6 +39,12 @@
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/scss",
+                "node_modules"
+              ]
+            },
             "assets": [
               {
                 "glob": "**/*",

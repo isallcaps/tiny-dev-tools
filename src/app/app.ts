@@ -1,9 +1,10 @@
 import {Component, inject, signal} from '@angular/core';
 import {RouterLink, RouterOutlet} from '@angular/router';
 import {NavMenu} from './nav-menu/nav-menu';
-import {APP_VERSION} from './core/constants/version.constants';
-import {ThemeService} from './core/services/theme';
-import {BrandComponent} from './shared/components/brand/brand';
+import {BrandComponent} from '@shared';
+import {APP_VERSION} from '@constants';
+import {ThemeService} from '@core';
+
 
 @Component({
 	selector: 'app-root',

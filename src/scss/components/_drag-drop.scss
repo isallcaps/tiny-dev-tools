@@ -1,0 +1,39 @@
+@use "../abstracts/variables" as vars;
+
+.drag-drop-zone {
+  border: 2px dashed var(--bs-border-color);
+  border-radius: vars.$global-radius;
+  background-color: var(--bs-tertiary-bg);
+  transition: all 0.2s ease-in-out;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+
+  // When a file is being hovered over the zone
+  &.drag-over {
+    background-color: var(--bs-primary-bg-subtle);
+    border-color: var(--bs-primary);
+    color: var(--bs-primary-text-emphasis);
+    transform: scale(1.01);
+  }
+
+  .upload-icon {
+    font-size: 2.5rem;
+    color: var(--bs-secondary-color);
+    margin-bottom: 1rem;
+
+    // Icon glows purple when active
+    .drag-over & {
+      color: var(--bs-primary);
+    }
+  }
+
+  .drop-text {
+    font-weight: 500;
+    color: var(--bs-secondary-color);
+
+    .drag-over & {
+      color: var(--bs-primary-text-emphasis);
+    }
+  }
+}

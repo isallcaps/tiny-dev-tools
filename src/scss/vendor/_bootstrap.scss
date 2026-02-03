@@ -1,0 +1,26 @@
+// 1. Pull in your brand variables
+// We use 'as vars' to keep the namespace clean
+@use "../abstracts/variables" as vars;
+
+// 2. Configure and Forward Bootstrap
+// The 'with' block replaces your old overrides and @import
+@forward "bootstrap/scss/bootstrap" with (
+  // Colors
+  $primary: vars.$tiny-purple,
+
+  // Layout & Borders
+  $border-radius: vars.$global-radius,
+  $border-radius-sm: vars.$global-radius,
+
+  // Typography
+  $font-family-sans-serif: vars.$font-main,
+
+  // Forms (Cleaned up from your original overrides)
+  $form-label-margin-bottom: vars.$label-margin,
+  $form-label-font-weight: vars.$label-weight,
+
+  // Emphasis (Light mode defaults)
+  $primary-text-emphasis: #6200ee,
+  $primary-bg-subtle: #f3efff,
+  $primary-border-subtle: #eaddff
+);
