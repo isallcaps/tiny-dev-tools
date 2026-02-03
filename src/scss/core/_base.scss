@@ -111,3 +111,19 @@
     -webkit-text-fill-color: var(--bs-body-color) !important;
   }
 }
+
+
+.hover-primary {
+  transition: color 0.15s ease-in-out;
+
+  &:hover {
+    color: var(--bs-primary) !important;
+  }
+}
+
+// Optional: Ensure the footer links feel cohesive
+footer {
+  .link-secondary:hover {
+    color: var(--bs-primary) !important;
+  }
+}
