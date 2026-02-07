@@ -2,6 +2,21 @@
 
 ---
 
+## [1.1.0] - 2026-02-07
+
+### Added
+
+* **Persistent Settings (Lorem):** Users can now save and remove custom character limits for the Lorem tool. These are
+  stored locally in the browser.
+
+* **CSV Parsing:** Integrated PapaParse to handle complex CSV data, specifically resolving issues with quoted fields and
+  commas in descriptions.
+
+### Fixed
+
+* **Jira Query Logic:** Resolved a bug where JQL field names (like "Epic Link") or values with hyphens (like "DEV-123")
+  were not being quoted correctly.
+
 ## [1.0.2] - 2026-02-02
 
 ### Added

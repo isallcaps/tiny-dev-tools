@@ -1,9 +1,10 @@
 import {Component, inject, signal, computed, linkedSignal} from '@angular/core';
-import {LoremFlavor, LoremIpsum} from './lorem-ipsum';
+import {LoremFlavor, LoremIpsum} from './services/lorem-ipsum';
 import {FormsModule} from '@angular/forms';
 import {NgbDropdown, NgbDropdownItem, NgbDropdownMenu, NgbDropdownToggle} from '@ng-bootstrap/ng-bootstrap';
 import {LOREM_BUT_EXACT_TOOL} from '@constants';
 import {CopyToClipboardBtn, ToolLayout} from '@shared';
+import {LoremStorage} from './services/lorem-storage';
 
 
 @Component({
@@ -28,13 +29,36 @@ import {CopyToClipboardBtn, ToolLayout} from '@shared';
 								   [ngModel]="characterLimit()"
 								   (ngModelChange)="characterLimit.set($event)" min="0">
 
+							<button class="btn btn-outline-primary" type="button"
+									(click)="loremStorage.addLimit(characterLimit())"
+									title="Save to favorites">
+								<i class="bi bi-bookmark-plus"></i>
+							</button>
+
 							<div ngbDropdown class="d-inline-block">
-								<button class="btn btn-primary dropdown-toggle dropdown-toggle-end dropdown-toggle-split"
+								<button class="btn btn-primary dropdown-toggle dropdown-toggle-split dropdown-toggle-end"
 										type="button" ngbDropdownToggle>
 								</button>
 								<div ngbDropdownMenu class="dropdown-menu dropdown-menu-end">
-									@for (item of characterLimitOptions; track item) {
+									<h6 class="dropdown-header text-uppercase fw-bold small">Standards</h6>
+									@for (item of defaultOptions; track item) {
 										<button ngbDropdownItem (click)="characterLimit.set(item)">{{ item }}</button>
+									}
+
+									@if (loremStorage.customLimits().length > 0) {
+										<div class="dropdown-divider"></div>
+										<h6 class="dropdown-header text-uppercase fw-bold small text-primary">Your Favorites</h6>
+										@for (item of loremStorage.customLimits(); track item) {
+											<div class="d-flex align-items-center justify-content-between pe-2">
+												<button ngbDropdownItem class="flex-grow-1" (click)="characterLimit.set(item)">
+													{{ item }}
+												</button>
+												<button class="btn btn-link btn-sm text-danger p-0"
+														(click)="loremStorage.removeLimit(item); $event.stopPropagation()">
+													<i class="bi bi-x-lg"></i>
+												</button>
+											</div>
+										}
 									}
 								</div>
 							</div>
@@ -96,8 +120,9 @@ export class LoremButExact {
 	readonly tool = LOREM_BUT_EXACT_TOOL;
 
 	private loremIpsum = inject(LoremIpsum);
+	loremStorage = inject(LoremStorage);
 
-	characterLimitOptions = [250, 256, 2000, 3500, 4000, 5000];
+	defaultOptions = [250, 256, 2000, 3500, 4000, 5000];
 
 	// Signals
 	characterLimit = signal(250);
@@ -116,6 +141,11 @@ export class LoremButExact {
 			this.prefix(),
 			this.suffix()
 		);
+	});
+
+	characterLimitOptions = computed(() => {
+		const custom = this.loremStorage.customLimits();
+		return [...new Set([...this.defaultOptions, ...custom])].sort((a, b) => a - b);
 	});
 
 	output = linkedSignal(() => this.generatedText());

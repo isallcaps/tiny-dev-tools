@@ -1,51 +1,26 @@
-// jql.utils.ts
+import * as Papa from 'papaparse';
 import {
 	GroupedJqlConfig,
 	JqlConfigRow,
 	SelectionMap,
 } from '../models/jql.model';
 
-export function parseJqlCsv(csv:string):JqlConfigRow[] {
-	const lines = csv
-		.split(/\r?\n/)
-		.map(line => line.trim())
-		.filter(Boolean);
+/**
+ * Parses CSV content using PapaParse to handle quotes and commas correctly.
+ */
+export function parseJqlCsv(csvContent:string):JqlConfigRow[] {
+	const result = Papa.parse(csvContent, {
+		header: true,
+		skipEmptyLines: true,
+		transformHeader: (header) => header.trim(),
+	});
 
-	if (!lines.length) return [];
-
-	const [headerLine, ...dataLines] = lines;
-	const headers = headerLine
-		.split(',')
-		.map(h => h.trim().toLowerCase());
-
-	const idxField = headers.indexOf('jirafield');
-	const idxValue = headers.indexOf('jiravalue');
-	const idxDescription = headers.indexOf('description');
-	const idxGroup = headers.indexOf('group');
-
-	if (idxField === -1 || idxValue === -1) {
-		console.warn('CSV missing required headers: jiraField,jiraValue');
-		return [];
-	}
-
-	return dataLines.reduce<JqlConfigRow[]>((acc, line) => {
-		const cols = line.split(',').map(c => c.trim());
-
-		const jiraField = cols[idxField];
-		const jiraValue = cols[idxValue];
-		if (!jiraField || !jiraValue) return acc;
-
-		acc.push({
-			jiraField,
-			jiraValue,
-			description:
-				idxDescription >= 0 ? cols[idxDescription] || undefined : undefined,
-			group:
-				idxGroup >= 0 ? cols[idxGroup] || undefined : undefined,
-		});
-
-		return acc;
-	}, []);
+	return result.data.map((row:any) => ({
+		jiraField: row.jiraField || '',
+		jiraValue: row.jiraValue || '',
+		description: row.description || '',
+		group: row.group || ''
+	}));
 }
 
 /**
@@ -55,11 +30,12 @@ export function groupRows(rows:JqlConfigRow[]):GroupedJqlConfig {
 	const grouped:GroupedJqlConfig = {};
 
 	for (const row of rows) {
-		const field = row.jiraField;
+		const field = row.jiraField?.trim();
+		if (!field) continue;
 
 		if (!grouped[field]) {
 			grouped[field] = {
-				ungrouped: [],
+				ungrouped: [], // Matches your JqlConfigRow lowercase name
 				groups: {},
 			};
 		}
@@ -82,7 +58,6 @@ export function groupRows(rows:JqlConfigRow[]):GroupedJqlConfig {
 
 /**
  * Build a JQL string from grouped config + selections.
- * Group labels are UI-only.
  */
 export function buildJqlFromSelection(
 	grouped:GroupedJqlConfig,
@@ -94,21 +69,16 @@ export function buildJqlFromSelection(
 		const fieldConfig = grouped[field];
 		const selectedValues:string[] = [];
 
-		// Ungrouped
-		for (const row of fieldConfig.ungrouped) {
-			const value = row.jiraValue.trim();
+		// Correctly reference 'ungrouped' per your model
+		const allRows = [
+			...fieldConfig.ungrouped,
+			...Object.values(fieldConfig.groups).flat()
+		];
+
+		for (const row of allRows) {
+			const value = row.jiraValue?.trim();
 			if (value && selections[field]?.[value]) {
 				selectedValues.push(value);
-			}
-		}
-
-		// Grouped
-		for (const groupName of Object.keys(fieldConfig.groups)) {
-			for (const row of fieldConfig.groups[groupName]) {
-				const value = row.jiraValue.trim();
-				if (value && selections[field]?.[value]) {
-					selectedValues.push(value);
-				}
 			}
 		}
 
@@ -116,26 +86,32 @@ export function buildJqlFromSelection(
 
 		const uniqueValues = Array.from(new Set(selectedValues)).sort();
 
-		// Quote field names with spaces / non-word chars (e.g. "Epic Link")
+		// Quote field names with spaces (e.g. "Epic Link")
 		const needsFieldQuotes = /[^\w]/.test(field);
 		const renderedField = needsFieldQuotes ? `"${field}"` : field;
 
 		if (uniqueValues.length === 1) {
-			const v = uniqueValues[0];
-			clauses.push(
-				`${renderedField} = ${quoteIfNeeded(v)}`,
-			);
+			clauses.push(`${renderedField} = ${quoteValue(uniqueValues[0])}`);
 		}
 		else {
-			clauses.push(
-				`${renderedField} in (${uniqueValues.map(quoteIfNeeded).join(', ')})`,
-			);
+			const joinedValues = uniqueValues.map(quoteValue).join(', ');
+			clauses.push(`${renderedField} in (${joinedValues})`);
 		}
 	}
 
 	return clauses.join(' AND ');
 }
 
-function quoteIfNeeded(value:string):string {
-	return /[\s-]/.test(value) ? `"${value}"` : value;
+function quoteValue(value:string):string {
+	if (!value) return 'EMPTY';
+
+	// Jira keys often have hyphens (DEV-123), so we must quote them
+	const needsQuotes = /[^\w]/.test(value) || value.includes('-');
+
+	if (needsQuotes) {
+		const escaped = value.replace(/"/g, '\\"');
+		return `"${escaped}"`;
+	}
+
+	return value;
 }

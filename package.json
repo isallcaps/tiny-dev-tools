@@ -43,6 +43,7 @@
     "@angular/compiler-cli": "^21.1.0",
     "@angular/localize": "^21.1.0",
     "@ng-bootstrap/ng-bootstrap": "^20.0.0",
+    "@types/papaparse": "^5.5.2",
     "angular-cli-ghpages": "^3.0.2",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
